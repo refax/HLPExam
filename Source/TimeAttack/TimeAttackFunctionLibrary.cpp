@@ -62,7 +62,7 @@ UProperty* UTimeAttackFunctionLibrary::RetrieveProperty(UObject* Object, FString
 
 	// Parse path.
 
-	while (Index < Path.Num() - 1)
+	while (Index < Path.Num()-1)
 	{
 		FString Member, ArrayIndexStr;
 		int32 ArrayIndex = 0;
@@ -111,11 +111,41 @@ UProperty* UTimeAttackFunctionLibrary::RetrieveProperty(UObject* Object, FString
 				UArrayProperty* ArrayProp = Cast<UArrayProperty>(Property);
 				if (ArrayProp != nullptr)
 				{
+					Struct = nullptr;
+					Class = nullptr;
+					ObjectProp = Cast<UObjectProperty>(ArrayProp->Inner);
+
+					Class = (ObjectProp != nullptr) ? ObjectProp->PropertyClass : nullptr;
+
+					if (Class == nullptr)
+					{
+						StructProp = Cast<UStructProperty>(ArrayProp->Inner);
+						Struct = (StructProp != nullptr) ? StructProp->Struct : nullptr;
+
+						if (Struct == nullptr)
+						{
+							OutTargetObject = nullptr;
+							break;
+						}
+						else
+						{
+							TArray<UObject> *arr = ArrayProp->ContainerPtrToValuePtr<TArray<UObject>>(OutTargetObject);
+							OutTargetObject = &(*arr)[ArrayIndex];
+							//FScriptArrayHelper InnerHelper{ ArrayProp, ArrayProp->ContainerPtrToValuePtr<void>(OutTargetObject) };
+							//OutTargetObject = *(UStruct**)(InnerHelper.GetRawPtr(ArrayIndex));
+						}
+					}
+					else
+					{
+						FScriptArrayHelper InnerHelper{ ArrayProp, ArrayProp->ContainerPtrToValuePtr<void>(OutTargetObject) };
+						OutTargetObject = *(UObject**)(InnerHelper.GetRawPtr(ArrayIndex));
+					}
+					
+					/**
 					Class = Cast<UObjectProperty>(ArrayProp->Inner)->PropertyClass;
 					Struct = nullptr;
+					*/
 
-					FScriptArrayHelper InnerHelper{ ArrayProp, ArrayProp->ContainerPtrToValuePtr<void>(OutTargetObject) };
-					OutTargetObject = *(UObject**)(InnerHelper.GetRawPtr(ArrayIndex));
 				}
 				else
 				{

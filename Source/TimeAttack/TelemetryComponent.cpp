@@ -73,7 +73,7 @@ void UTelemetryComponent::DrawTelemetry(UCanvas* Canvas, float& YL, float& YPos)
 		UObject* Object = nullptr;
 		UProperty* Property = UTimeAttackFunctionLibrary::RetrieveProperty(GetOwner(), Telemetry, Object);
 
-		if (Property != nullptr)
+		if (Property != nullptr && Object != nullptr)
 		{
 			UFloatProperty* FloatProp = Cast<UFloatProperty>(Property);
 
