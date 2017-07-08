@@ -10,6 +10,8 @@
 #include "CanvasItem.h"
 #include "CanvasTypes.h"
 
+#include "TimeAttackFunctionLibrary.h"
+
 #pragma optimize ("", off)
 
 static TAutoConsoleVariable<FString> CVarTelemetry(
@@ -68,10 +70,22 @@ void UTelemetryComponent::DrawTelemetry(UCanvas* Canvas, float& YL, float& YPos)
 		float Value = 0.f;
 
 		// TODO: Get the correct property's value using reflection.
+		UObject* Object = nullptr;
+		UProperty* Property = UTimeAttackFunctionLibrary::RetrieveProperty(GetOwner(), Telemetry, Object);
+
+		if (Property != nullptr)
+		{
+			UFloatProperty* FloatProp = Cast<UFloatProperty>(Property);
+
+			if (FloatProp != nullptr)
+			{
+				Value = FloatProp->GetPropertyValue_InContainer(Object);
+			}
+		}
 
 		// Support the following queries:
 		
-		// 1) VehicleSimData.ChassisSimData.Speed
+		// 1) VehicleSimData.ChassisSimData.Speed	OK
 
 		// 2) VehicleSimData.WheelSimData[i].Speed
 		// 3) VehicleSimData.WheelSimData[i].SteerAngle
@@ -79,10 +93,6 @@ void UTelemetryComponent::DrawTelemetry(UCanvas* Canvas, float& YL, float& YPos)
 		// 5) VehicleSimData.WheelSimData[i].SuspensionOffset
 
 		// HINT: See UIgnitionGameplayFunctionLibrary::RetrieveProperty.
-
-		{
-			Value = FMath::RandRange(0.f, 1.f);
-		}
 
 		TelemetryValues.Add(Value);
 	}
