@@ -1,0 +1,15 @@
+Content/StarterContent/
+Intermediate/CachedAssetRegistry.bin
+Intermediate/AssetRegistryCache/
+Intermediate/Build/
+Intermediate/Config/
+Saved/
+SuperCarAttack.VC.db
+.vs/SuperCarAttack/v14/.suo
+SuperCarAttack.VC.VC.opendb
+ipch/
+Intermediate/ProjectFiles/SuperCarAttack.vcxproj
+Intermediate/ProjectFiles/SuperCarAttack.vcxproj.filters
+Intermediate/ProjectFiles/UE4.vcxproj
+Intermediate/
+SuperCarAttack.sln
