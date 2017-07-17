@@ -115,36 +115,22 @@ UProperty* UTimeAttackFunctionLibrary::RetrieveProperty(UObject* Object, FString
 					Class = nullptr;
 					ObjectProp = Cast<UObjectProperty>(ArrayProp->Inner);
 
-					Class = (ObjectProp != nullptr) ? ObjectProp->PropertyClass : nullptr;
-
-					if (Class == nullptr)
+					if (ObjectProp != nullptr)
 					{
-						StructProp = Cast<UStructProperty>(ArrayProp->Inner);
-						Struct = (StructProp != nullptr) ? StructProp->Struct : nullptr;
-
-						if (Struct == nullptr)
-						{
-							OutTargetObject = nullptr;
-							break;
-						}
-						else
-						{
-							TArray<UObject> *arr = ArrayProp->ContainerPtrToValuePtr<TArray<UObject>>(OutTargetObject);
-							OutTargetObject = &(*arr)[ArrayIndex];
-							//FScriptArrayHelper InnerHelper{ ArrayProp, ArrayProp->ContainerPtrToValuePtr<void>(OutTargetObject) };
-							//OutTargetObject = *(UStruct**)(InnerHelper.GetRawPtr(ArrayIndex));
-						}
+						Class = ObjectProp->PropertyClass;
+						FScriptArrayHelper InnerHelper{ ArrayProp, ArrayProp->ContainerPtrToValuePtr<void>(OutTargetObject) };
+						OutTargetObject = *(UStruct**)(InnerHelper.GetRawPtr(ArrayIndex));
 					}
 					else
 					{
-						FScriptArrayHelper InnerHelper{ ArrayProp, ArrayProp->ContainerPtrToValuePtr<void>(OutTargetObject) };
-						OutTargetObject = *(UObject**)(InnerHelper.GetRawPtr(ArrayIndex));
+						StructProp = Cast<UStructProperty>(ArrayProp->Inner);
+						if (StructProp != nullptr)
+						{
+							Struct = StructProp->Struct;
+							FScriptArrayHelper InnerHelper{ ArrayProp, ArrayProp->ContainerPtrToValuePtr<void>(OutTargetObject) };
+							OutTargetObject = (UStruct*)(InnerHelper.GetRawPtr(ArrayIndex));
+						}
 					}
-					
-					/**
-					Class = Cast<UObjectProperty>(ArrayProp->Inner)->PropertyClass;
-					Struct = nullptr;
-					*/
 
 				}
 				else
