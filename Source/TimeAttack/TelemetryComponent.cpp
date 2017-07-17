@@ -69,9 +69,18 @@ void UTelemetryComponent::DrawTelemetry(UCanvas* Canvas, float& YL, float& YPos)
 	{
 		float Value = 0.f;
 
+		FString Path, UnitMeasure;
+		int32 ArrayIndex = 0;
+
+		if (!Telemetry.Split(FString(TEXT(" ")), &Path, &UnitMeasure))
+		{
+			Path = Telemetry;
+		}
+	
+
 		// TODO: Get the correct property's value using reflection.
 		UObject* Object = nullptr;
-		UProperty* Property = UTimeAttackFunctionLibrary::RetrieveProperty(GetOwner(), Telemetry, Object);
+		UProperty* Property = UTimeAttackFunctionLibrary::RetrieveProperty(GetOwner(), Path, Object);
 
 		if (Property != nullptr && Object != nullptr)
 		{
@@ -80,7 +89,22 @@ void UTelemetryComponent::DrawTelemetry(UCanvas* Canvas, float& YL, float& YPos)
 			if (FloatProp != nullptr)
 			{
 				Value = FloatProp->GetPropertyValue_InContainer(Object);
+
+				if (UnitMeasure.Equals("m/s"))
+				{
+					Value *= 0.01f;
+				}
+				else if (UnitMeasure.Equals("km/h"))
+				{
+					Value *= 0.01f * 3.6f;
+				}
+				else if (UnitMeasure.Equals("rad"))
+				{
+					Value *= 0.0174533;
+				}
 			}
+
+
 		}
 
 		// Support the following queries:
